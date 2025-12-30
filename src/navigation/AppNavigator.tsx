@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { CommonActions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import CreateNoteScreen from '../screens/CreateNoteScreen';
@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthProvider';
 import AuthNavigator from './AuthNavigator';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { LogOut } from 'lucide-react-native';
+import { navigationRef } from './RootNavigation';
 
 const Stack = createNativeStackNavigator<ParamList>();
 
@@ -17,6 +18,12 @@ const Header = () => {
 
   const handleLogout = useCallback(async () => {
     await signOut();
+    navigationRef.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Auth' }],
+      }),
+    );
   }, [signOut]);
 
   return (
@@ -29,7 +36,7 @@ const Header = () => {
 const AppNavigator = () => {
   const { user } = useAuth();
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName={!user ? 'Auth' : 'Home'}>
         <Stack.Screen
           options={{

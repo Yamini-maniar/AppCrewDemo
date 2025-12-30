@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, StyleSheet, ToastAndroid, TextInput } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -12,6 +12,13 @@ const EditNoteScreen = ({ route, navigation }: Props) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content || '');
   const [loading, setLoading] = useState(false);
+
+  const isSame = useMemo(
+    () =>
+      title?.trim() === note.title?.trim() &&
+      content?.trim() === note.content?.trim(),
+    [content, note.content, note.title, title],
+  );
 
   const handleUpdate = useCallback(async () => {
     if (!title.trim()) {
@@ -57,6 +64,7 @@ const EditNoteScreen = ({ route, navigation }: Props) => {
         title="Update Note"
         onPress={handleUpdate}
         loading={loading}
+        disabled={isSame}
         style={styles.button}
       />
     </View>
